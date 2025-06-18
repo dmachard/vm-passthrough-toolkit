@@ -1,0 +1,42 @@
+# Gamepad VM Passthrough - udev Rules
+# Automatically attaches USB gamepads to VMs when plugged in
+
+# =============================================================================
+# XBOX CONTROLLERS
+# =============================================================================
+
+# Xbox 360 Controller
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="045e", ATTR{idProduct}=="028e", \
+  RUN+="/usr/bin/logger -t gamepad-vm 'Xbox 360 controller attached %p'", \
+  RUN+="/usr/local/bin/attach-gamepad.sh %p"
+ACTION=="remove", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{PRODUCT}=="45e/28e/*", \
+  RUN+="/usr/bin/logger -t gamepad-vm Xbox 360 controller detached %p"
+
+# Xbox One Controller  
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="045e", ATTR{idProduct}=="02ea", \
+  RUN+="/usr/bin/logger -t gamepad-vm 'Xbox One controller attached %p'", \
+  RUN+="/usr/local/bin/attach-gamepad.sh %p"
+
+# =============================================================================
+# PLAYSTATION CONTROLLERS  
+# =============================================================================
+
+# DualShock 4 (PS4 Controller)
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="054c", ATTR{idProduct}=="05c4", \
+  RUN+="/usr/bin/logger -t gamepad-vm 'DualShock 4 Controller detected: %p'", \
+  RUN+="/usr/local/bin/attach-gamepad.sh %p"
+
+# =============================================================================
+# USAGE NOTES
+# =============================================================================
+# 
+# To add a new gamepad:
+# 1. Find USB IDs: lsusb (look for Vendor:Product IDs)
+# 2. Add rule following the pattern above
+# 3. Reload rules: sudo udevadm control --reload-rules
+# 4. Test: sudo udevadm test /sys/path/to/device
+#
+# To debug:
+# - Monitor events: sudo udevadm monitor --environment --udev  
+# - Check logs: tail -f /tmp/gamepad.log
+# - System log: journalctl -f -t gamepad-vm
