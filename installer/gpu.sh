@@ -10,7 +10,6 @@ CONFIG_FILE="/etc/passthrough/config.conf"
 DEFAULT_LOGFILE="/tmp/passthrough_setup.log"
 DEFAULT_STATE_FILE="/tmp/passthrough_setup.state"
 
-# Check if running as root
 # Load configuration
 if [[ -f "$CONFIG_FILE" ]]; then
     echo "Loading configuration from $CONFIG_FILE" >> "$DEFAULT_LOGFILE"

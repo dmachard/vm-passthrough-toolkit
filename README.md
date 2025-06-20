@@ -1,13 +1,15 @@
-# 🧰 VM Passthrough Toolkit
+# VM Passthrough Toolkit
 
-Automated Setup to enable GPU and gamepad passthrough on a Ubuntu/Debian-based Linux distribution host
-to virtual machines (QEMU/KVM) using [Looking Glass](https://looking-glass.io/) and VFIO and technology.
-Ideal for gaming VM setups.
+A toolkit to automate GPU and gamepad passthrough setup on Ubuntu/Debian-based systems using [Looking Glass](https://looking-glass.io/), VFIO, and QEMU/KVM virtualization.  
+Ideal for gaming virtual machines.
 
 ## ✨ Features
 
-- 🎮 **Gamepad Passthrough**
-- 🖥️ **GPU Passthrough**
+- 🖥️ **GPU Passthrough** with HDMI dummy plug
+- ⚙️ **CPU Pinning** for performance optimization
+- 🎮 **Gamepad Passthrough** via VFIO
+- **Memory Tuning** Hugepages
+- **Disk** (tbc)
 
 ## 🚀 Quick Start
 
@@ -34,6 +36,7 @@ Run install
 ```bash
 ./setup.sh --all         # Install all
 ./setup.sh --gpu         # Install only GPU module
+./setup.sh --cpu         # Configure CPU pinning
 ./setup.sh --gamepad     # Install only gamepad module
 ```
 
@@ -47,18 +50,18 @@ sudo ./setup.sh
 ```
 
 
-## Toolkit description
+## 🛠️ Toolkit Overview
 
-The script will:
-1. Detect your hardware configuration
+The setup script performs the following:
+1. Hardware Detection
     - **CPU Virtualization Check**: Verifies that VT-x/VT-d (Intel) or AMD-V/AMD-Vi (AMD) is enabled
     - **IOMMU Support**: Checks for IOMMU capability and configuration
     - **RAM Validation**: Ensures sufficient memory (16GB+ recommended)
-2. Present available GPUs and audio controllers
+2. GPU & Audio Detection
     - **Multi-GPU Detection**: Identifies all available GPUs and their PCI addresses
     - **Audio Controller Detection**: Finds audio devices that can be passed through alongside GPUs
-3. Allow you to select which devices to pass through
-4. Install all required packages and dependencies
+3. Module Selection
+4. Dependency Installation
     - **QEMU/KVM**: Installs virtualization platform
     - **Libvirt**: Configures virtual machine management
     - **Virt-Manager**: Provides GUI for VM creation and management
@@ -79,7 +82,7 @@ This will check that:
 - Looking Glass device (`/dev/kvmfr0`) is available
 - Looking Glass client is installed and accessible
 
-## Troubleshooting
+## 🧩 Troubleshooting
 
 
 Installation logs

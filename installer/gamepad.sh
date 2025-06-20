@@ -1,16 +1,13 @@
 #!/bin/bash
-set -e
 
 set -euo pipefail
-
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 info "Installing Gamepad VM Passthrough..."
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then
-   error "This script must be run as root (use sudo)" 
-   exit 1
+   error "This script must be run as root (use sudo)"
 fi
 
 # Copy script

@@ -10,10 +10,8 @@
 CONFIG_FILE="/etc/passthrough/config.conf"
 DEFAULT_VM="win10-gaming"
 
-# Check if running as root
 # Load configuration
 if [[ -f "$CONFIG_FILE" ]]; then
-    echo "Loading configuration from $CONFIG_FILE" >> "$DEFAULT_LOGFILE"
     source "$CONFIG_FILE"
 fi
 

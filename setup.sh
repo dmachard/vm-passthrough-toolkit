@@ -57,14 +57,31 @@ check_dep() {
   fi
 }
 
+# Check if the VM is defined (exists in libvirt)
+vm_exists() {
+  virsh list --all --name | grep -Fxq "$VM_NAME"
+}
+
+require_vm_exists() {
+  if vm_exists; then
+    success "VM '$VM_NAME' exists."
+  else
+    error "VM '$VM_NAME' does not exist. Check the VM name or define it using virt-manager or virsh."
+    exit 1
+  fi
+}
+
+
 main() {
   local DO_GPU=0
+  local DO_CPU=0
   local DO_GAMEPAD=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --all)       DO_GPU=1; DO_GAMEPAD=1 ;;
+      --all)       DO_GPU=1; DO_CPU=1; DO_GAMEPAD=1 ;;
       --gpu)       DO_GPU=1 ;;
+      --cpu)       DO_CPU=1 ;;
       --gamepad)   DO_GAMEPAD=1 ;;
       -h|--help)   usage; exit 0 ;;
       *)           error "Unknown option: $1"; usage; exit 1 ;;
@@ -86,13 +103,18 @@ main() {
   info "Creating directories..."
   mkdir -p /etc/passthrough
 
-  if [[ ! -f /etc/passthrough/config.conf ]]; then
+  CONFIG_FILE="/etc/passthrough/config.conf"
+  if [[ ! -f $CONFIG_FILE ]]; then
       info "Creating configuration file..."
       cp config/config.conf /etc/passthrough/config.conf
   else
       info "Configuration file already exists, keeping current settings"
   fi
+  source "$CONFIG_FILE"
 
+  require_vm_exists
+
+  [[ $DO_CPU -eq 1 ]]     && "$INSTALLER_DIR/cpu.sh"
   [[ $DO_GPU -eq 1 ]]     && "$INSTALLER_DIR/gpu.sh"
   [[ $DO_GAMEPAD -eq 1 ]] && "$INSTALLER_DIR/gamepad.sh"
 
