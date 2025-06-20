@@ -47,21 +47,8 @@ fi
 ###############################################################################
 # Install libvirt master hook
 ###############################################################################
-HOOK_DIR="/etc/libvirt/hooks"
-HOOK_MAIN="$HOOK_DIR/qemu"
-VM_HOOK_BASE="$HOOK_DIR/qemu.d/$VM_NAME"
-PREPARE_DIR="$VM_HOOK_BASE/prepare/begin"
-RELEASE_DIR="$VM_HOOK_BASE/release/end"
-perf_script="$PREPARE_DIR/cpu-perf-mode.sh"
-normal_script="$RELEASE_DIR/cpu-normal-mode.sh"
-
-sudo mkdir -p "$HOOK_DIR"
-sudo wget -q 'https://raw.githubusercontent.com/PassthroughPOST/VFIO-Tools/master/libvirt_hooks/qemu' \
-     -O "$HOOK_MAIN"
-sudo chmod +x "$HOOK_MAIN"
-info "Installed master libvirt hook: $HOOK_MAIN"
-
-sudo mkdir -p "$PREPARE_DIR" "$RELEASE_DIR"
+perf_script="/etc/libvirt/hooks/qemu.d/$VM_NAME/prepare/begin/cpu-perf-mode.sh"
+normal_script="/etc/libvirt/hooks/qemu.d/$VM_NAME/release/end/cpu-normal-mode.sh"
 
 cat > "$perf_script" <<EOF
 #!/bin/bash
@@ -93,5 +80,36 @@ EOF
 
 chmod +x "$perf_script" "$normal_script"
 
-info "VM‑specific hooks installed under $VM_HOOK_BASE"
+info "Updating CPU pinning to P‑cores set \"$pcores_list\"…"
+
+if [[ -z "${TEMP_XML:-}" || ! -f "$TEMP_XML" ]]; then
+    TEMP_XML=$(mktemp)
+    virsh dumpxml "$VM_NAME" > "$TEMP_XML"
+fi
+
+VCPU_COUNT=$(virsh dominfo "$VM_NAME" | awk '/^CPU\(s\)/ {print $2}')
+
+sed -i '/<cputune>/,/<\/cputune>/d' "$TEMP_XML"
+
+
+CPU_XML=$(mktemp)
+{
+    echo "  <cputune>"
+    for ((i=0; i<VCPU_COUNT; i++)); do
+        echo "    <vcpupin vcpu='$i' cpuset='$pcores_list'/>"
+    done
+    echo "    <emulatorpin cpuset='$pcores_list'/>"
+    echo "  </cputune>"
+} > "$CPU_XML"
+
+sed -i "/<\/vcpu>/r $CPU_XML" "$TEMP_XML"
+rm -f "$CPU_XML"
+
+info "CPU pinning XML block added (${VCPU_COUNT} vCPU → cpuset $pcores_list)"
+if [[ -f "${TEMP_XML:-}" ]]; then
+    info "Applying VM configuration changes..."
+    virsh define "$TEMP_XML" >> "$LOGFILE" 2>&1
+    rm "$TEMP_XML"
+    success "VM configuration updated successfully"
+fi
 success "CPU pinning and libvirt hooks setup complete."

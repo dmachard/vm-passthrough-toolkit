@@ -16,7 +16,9 @@ Usage: $(basename "$0") [OPTIONS]
 OPTIONS
   --all          Configure all passthrough modules (GPU + gamepad)
   --gpu          Configure GPU passthrough
+  --cpu          Configure CPU passthrough
   --gamepad      Configure gamepad passthrough
+  --hugepages    Configure hugepages memory backing
   -h, --help     Show this help message
 
 Examples
@@ -71,11 +73,26 @@ require_vm_exists() {
   fi
 }
 
+setup_libvirt_hooks() {
+  HOOK_DIR="/etc/libvirt/hooks"
+  HOOK_MAIN="$HOOK_DIR/qemu"
+  HOOK_BASE="$HOOK_DIR/qemu.d/$VM_NAME"
+ 
+  sudo mkdir -p "$HOOK_DIR"
+  sudo wget -q 'https://raw.githubusercontent.com/PassthroughPOST/VFIO-Tools/master/libvirt_hooks/qemu' \
+      -O "$HOOK_MAIN"
+  sudo chmod +x "$HOOK_MAIN"
+
+  # Create libvirt hooks directories
+  mkdir -p $HOOK_BASE/{prepare/begin,release/end}
+  info "Installed master libvirt hook"
+}
 
 main() {
   local DO_GPU=0
   local DO_CPU=0
   local DO_GAMEPAD=0
+  local DO_HUGEPAGES=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -83,6 +100,7 @@ main() {
       --gpu)       DO_GPU=1 ;;
       --cpu)       DO_CPU=1 ;;
       --gamepad)   DO_GAMEPAD=1 ;;
+      --hugepages) DO_HUGEPAGES=1 ;;
       -h|--help)   usage; exit 0 ;;
       *)           error "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -104,19 +122,17 @@ main() {
   mkdir -p /etc/passthrough
 
   CONFIG_FILE="/etc/passthrough/config.conf"
-  if [[ ! -f $CONFIG_FILE ]]; then
-      info "Creating configuration file..."
-      cp config/config.conf /etc/passthrough/config.conf
-  else
-      info "Configuration file already exists, keeping current settings"
-  fi
+  cp config/config.conf /etc/passthrough/config.conf
   source "$CONFIG_FILE"
 
   require_vm_exists
+  setup_libvirt_hooks
+  chmod +x ./installer/*
 
   [[ $DO_CPU -eq 1 ]]     && "$INSTALLER_DIR/cpu.sh"
   [[ $DO_GPU -eq 1 ]]     && "$INSTALLER_DIR/gpu.sh"
   [[ $DO_GAMEPAD -eq 1 ]] && "$INSTALLER_DIR/gamepad.sh"
+  [[ $DO_HUGEPAGES -eq 1 ]] && "$INSTALLER_DIR/hugepages.sh"
 
   success "Setup completed successfully!"
 }

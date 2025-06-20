@@ -20,7 +20,7 @@ VM_NAME="${VM_NAME:-$DEFAULT_VM}"
 LOGFILE="${LOGFILE:-$DEFAULT_LOGFILE}"
 SYS_PATH="$1"
 
-echo "Using VM: ${VM_NAME:-$DEFAULT_VM}" >> "$DEFAULT_LOGFILE"
+echo "Using VM: ${VM_NAME:-$DEFAULT_VM}" >> "$LOGFILE"
 
 log_message() {
     local message="$1"

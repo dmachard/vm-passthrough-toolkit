@@ -12,8 +12,8 @@ fi
 
 # Copy script
 info "Installing script..."
-cp scripts/attach-gamepad.sh /usr/local/bin/
-chmod +x /usr/local/bin/attach-gamepad.sh
+cp scripts/attach_gamepad.sh /usr/local/bin/
+chmod +x /usr/local/bin/attach_gamepad.sh
 
 # Copy udev rules  
 info "Installing udev rules..."

@@ -7,18 +7,15 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 # Global variables
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="/etc/passthrough/config.conf"
-DEFAULT_LOGFILE="/tmp/passthrough_setup.log"
 DEFAULT_STATE_FILE="/tmp/passthrough_setup.state"
 
 # Load configuration
 if [[ -f "$CONFIG_FILE" ]]; then
-    echo "Loading configuration from $CONFIG_FILE" >> "$DEFAULT_LOGFILE"
     source "$CONFIG_FILE"
 fi
 
 # Set defaults if not configured
 VM_NAME="${VM_NAME:-$DEFAULT_VM}"
-LOG_FILE="${LOG_FILE:-$DEFAULT_LOGFILE}"
 STATE_FILE="${STATE_FILE:-$DEFAULT_STATE_FILE}"
 
 # Progress bar function
@@ -236,7 +233,7 @@ install_dependencies() {
     
     for ((i=0; i<${#packages[@]}; i++)); do
         show_progress $((i+1)) ${#packages[@]}
-        sudo apt-get install -y "${packages[$i]}" >> "$LOG_FILE" 2>&1
+        sudo apt-get install -y "${packages[$i]}" >> "$LOGFILE" 2>&1
     done
     echo # New line after progress bar
     
@@ -352,13 +349,13 @@ install_looking_glass() {
     cd client/build
 
     info "Running CMake..."
-    cmake .. >> "$LOG_FILE" 2>&1 || error "CMake configuration failed. See $LOG_FILE"
+    cmake .. >> "$LOGFILE" 2>&1 || error "CMake configuration failed. See $LOGFILE"
 
     info "Compiling..."
-    make -j"$(nproc)" >> "$LOG_FILE" 2>&1 || error "Build failed. See $LOG_FILE"
+    make -j"$(nproc)" >> "$LOGFILE" 2>&1 || error "Build failed. See $LOGFILE"
 
     info "Installing..."
-    sudo make install >> "$LOG_FILE" 2>&1 || error "Installation failed. See $LOG_FILE"
+    sudo make install >> "$LOGFILE" 2>&1 || error "Installation failed. See $LOGFILE"
 
     success "Looking Glass installed"
 }

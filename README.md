@@ -8,7 +8,7 @@ Ideal for gaming virtual machines.
 - 🖥️ **GPU Passthrough** with HDMI dummy plug
 - ⚙️ **CPU Pinning** for performance optimization
 - 🎮 **Gamepad Passthrough** via VFIO
-- **Memory Tuning** Hugepages
+- 🧠 **Memory Tuning** with Hugepages
 - **Disk** (tbc)
 
 ## 🚀 Quick Start
@@ -38,6 +38,7 @@ Run install
 ./setup.sh --gpu         # Install only GPU module
 ./setup.sh --cpu         # Configure CPU pinning
 ./setup.sh --gamepad     # Install only gamepad module
+./setup.sh --hugepages   # Configure hugepages memory backing
 ```
 
 
