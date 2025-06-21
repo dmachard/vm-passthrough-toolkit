@@ -9,6 +9,7 @@ Ideal for gaming virtual machines.
 - ⚙️ **CPU Pinning** for performance optimization
 - 🎮 **Gamepad Passthrough** via VFIO
 - 🧠 **Memory Tuning** with Hugepages
+- 🧬 **BIOS Passthrough** with vendor-specific tweaks
 - **Disk** (tbc)
 
 ## 🚀 Quick Start

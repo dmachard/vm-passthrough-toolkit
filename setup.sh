@@ -19,6 +19,7 @@ OPTIONS
   --cpu          Configure CPU passthrough
   --gamepad      Configure gamepad passthrough
   --hugepages    Configure hugepages memory backing
+  --bios         Configure BIOS/sysinfo passthrough
   -h, --help     Show this help message
 
 Examples
@@ -93,6 +94,7 @@ main() {
   local DO_CPU=0
   local DO_GAMEPAD=0
   local DO_HUGEPAGES=0
+  local DO_BIOS=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -101,6 +103,7 @@ main() {
       --cpu)       DO_CPU=1 ;;
       --gamepad)   DO_GAMEPAD=1 ;;
       --hugepages) DO_HUGEPAGES=1 ;;
+      --bios)      DO_BIOS=1 ;;
       -h|--help)   usage; exit 0 ;;
       *)           error "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -133,6 +136,7 @@ main() {
   [[ $DO_GPU -eq 1 ]]     && "$INSTALLER_DIR/gpu.sh"
   [[ $DO_GAMEPAD -eq 1 ]] && "$INSTALLER_DIR/gamepad.sh"
   [[ $DO_HUGEPAGES -eq 1 ]] && "$INSTALLER_DIR/hugepages.sh"
+  [[ $DO_BIOS -eq 1 ]]    && "$INSTALLER_DIR/bios.sh"
 
   success "Setup completed successfully!"
 }
