@@ -86,7 +86,7 @@ rm "$SYSINFO_TEMP"
 info "Updating VM XML configuration..."
 
 # Apply new configuration
-virsh undefine "$VM_NAME"
+# virsh undefine "$VM_NAME"
 virsh define "$TEMP_XML"
 
 rm "$TEMP_XML"

@@ -188,6 +188,7 @@ install_dependencies() {
         "virt-manager"
         "bridge-utils"
         "virt-viewer"
+        "ovmf"
 
         # Compilation / build
         "linux-headers-$(uname -r)"
@@ -333,6 +334,13 @@ install_looking_glass() {
     # Install kernel module
     info "Installing Looking Glass kernel module..."
     cd module
+
+    # Extract version from dkms.conf
+    kvmfr_ver=$(grep '^PACKAGE_VERSION' dkms.conf | cut -d'"' -f2)
+
+    # Remove existing version (ignore errors)
+    dkms remove -m kvmfr -v "$kvmfr_ver" --all 2>/dev/null || true
+
     dkms install .
     cd ..
 
