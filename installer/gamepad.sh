@@ -11,7 +11,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Copy script
-info "Installing script..."
+info "Installing scripts..."
 cp scripts/attach_gamepad.sh /usr/local/bin/
 chmod +x /usr/local/bin/attach_gamepad.sh
 
